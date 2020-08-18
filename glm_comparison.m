@@ -39,12 +39,15 @@
             glm(idx).pmods = 'psi';
             %}
 
+            %{
             idx = idx + 1;
             glm(idx).glmodel = 55;
             glm(idx).name = 'GLM 55';
             glm(idx).model = 'asym_sticky_rpe';
             glm(idx).pmods = 'RPE';
+            %}
 
+            %{
             idx = idx + 1;
             glm(idx).glmodel = 6;
             glm(idx).name = 'GLM 6';
@@ -56,22 +59,31 @@
             glm(idx).name = 'GLM 4';
             glm(idx).model = 'bayesian';
             glm(idx).pmods = 'RPE*psi';
+            %}
 
+            %{
             idx = idx + 1;
             glm(idx).glmodel = 5;
             glm(idx).name = 'GLM 5';
             glm(idx).model = 'bayesian';
             glm(idx).pmods = 'RPE,psi';
+            %}
 
-%             
+             
 %             idx = idx + 1;
 %             glm(idx).glmodel = 25;
 %             glm(idx).name = 'GLM 25';
-%             glm(idx).model = 'RPEpsi & RPE & psi';
-%             glm(idx).pmods = 'RPEpsi & RPE & psi';
+%             glm(idx).model = 'bayesian';
+%             glm(idx).pmods = 'RPEpsi,RPE,psi';
 
 
 
+%             idx = idx + 1;
+%             glm(idx).glmodel = 11;
+%             glm(idx).name = 'GLM 11';
+%             glm(idx).model = 'bayesian';
+%             glm(idx).pmods = 'psi';
+%
             
 %             idx = idx + 1;
 %             glm(idx).glmodel = 20;
@@ -97,15 +109,16 @@
                 %bic = ccnl_bic(optCon_expt_nosmooth(), glm(i).glmodel, 'masks/Ca_only.nii', goodSubjs());
                 %bic = ccnl_bic(optCon_expt_nosmooth(), glm(i).glmodel, 'masks/NAC.nii', goodSubjs());
                 %bic = ccnl_bic(EXPT, glm(i).glmodel, 'masks/sphere_glm44_losses_adversarial_-_wins_adversarial_-_losses_benevolent_+_wins_benevolent_22_30_-18_r=0mm.nii', goodSubjs());
-                bic = ccnl_bic(EXPT, glm(i).glmodel, 'masks/Pu.nii', goodSubjs());
-                %bic = ccnl_bic(EXPT, glm(i).glmodel, 'masks/NAC.nii', goodSubjs());
+                %bic = ccnl_bic(EXPT, glm(i).glmodel, 'masks/Ca.nii', goodSubjs());
+                bic = ccnl_bic(EXPT, glm(i).glmodel, 'masks/NAC.nii', goodSubjs());
+                %bic = ccnl_bic(EXPT, glm(i).glmodel, 'masks/Pu.nii', goodSubjs());
                 glm(i).bic = bic;
                 bics = [bics bic];
             end
 
             lme = -0.5 * bics;
 
-            [alpha, exp_r, xp, pxp, bor] = bms(lme);
+            [alpha, exp_r, xp, pxp, bor, g] = bms(lme);
 
             %save(cached_file);
         end
