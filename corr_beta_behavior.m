@@ -48,8 +48,6 @@ for i = 1:length(masks)
     clear B;
 
     behavioral_subj_indices = [];
-    Brun = [];
-    Srun = [];
     for j = 1:length(goodSubjs) 
         fmri_subj_idx = goodSubjs(j);
         %tmp = ccnl_get_beta(optCon_expt, 50, 'temporal', masks{i}, subj); 
@@ -57,10 +55,6 @@ for i = 1:length(masks)
         %tmp = ccnl_get_tmap(optCon_expt, 11, 'psi', masks{i}, subj); 
         b(j) = mean(tmp(:)); %mean(tmp,2) will give you a vector of 4 betas (for each run) - can average across the 2 conds here (look and see the histogram for the positivity bias in psych sci paper)
         bic(j) = ccnl_bic(EXPT, 11, masks{i}, fmri_subj_idx);
-
-        B = mean(ccnl_get_beta_series(EXPT, 11, fmri_subj_idx, 'psi', masks{i}), 2);
-        Brun = [Brun; B];
-        Srun = [Srun; repmat([j], length(B), 1)];
 
         %data.sub = original_subject_idx(subj) %something like this/make sure this is right
         % find subject in behavioral data
@@ -84,55 +78,12 @@ for i = 1:length(masks)
     accrun = [];
     for j = 1:length(data2)
         acc(j) = mean(data2(j).acc);
-       
-        fmri_subj_idx = goodSubjs(j);
-        runs = find(goodRuns{fmri_subj_idx});
-        for r = runs
-            accrun = [accrun; mean(data2(j).acc(data2(j).run_num == r))];
-        end
-        %{
-        l = latents(j).latent_guess; % model latent guess
-        g = data2(j).latent_guess; % subject latent guess
-        lik(j) = sum(l(g == 1)) + sum((1 - l(g ~= 1)));
-        %}
     end
 
 
-    %[r,p] = corr(all_b', acc', 'type', 'Spearman') %correlate betas with overall accuracy
+    disp('psi betas track behavior');
     [r,p] = corr(all_b', acc') %correlate betas with overall accuracy
 
-
-    %{
-    Srun = categorical(Srun);
-    accrun = log(accrun ./ (1 - accrun));
-    accrun(isinf(accrun)) = 1000;
-    tbl = table(Brun, accrun, Srun);
-    %formula = 'Brun ~ 1 + accrun + (1 + accrun | Srun)';
-    formula = 'accrun ~ 1 + Brun + (1 + Brun | Srun)';
-    results_glme = fitglme(tbl,formula,'Distribution','Gaussian','Link','Identity','FitMethod','Laplace',  'EBMethod', 'TrustRegion2D','CovariancePattern','diagonal')
-
-    acc = acc';
-    all_b = all_b';
-    logacc = log(acc ./ (1 - acc));
-    T = table(acc, all_b);
-    res = fitglme(T, 'acc ~ 1 + all_b')
-    %}
-
-
-    %logbf = log(g(:,2)./(1 - g(:,2))); % neural; from glm_comparison
-    %[r,p] = corr(all_b', logbf) %correlate betas with overall accuracy
-
-    %[r,p] = corr(bic', acc') %correlate betas with overall accuracy
-
-    %[r,p] = corr(all_b', lik') %correlate betas with overall accuracy
-
-    %{
-    bms_results = mfit_bms(results);
-    g = bms_results.g;
-    logbf = log(g(:,2)./(1 - g(:,2))); % behavioral; see corr_bic 
-    logbf = logbf(behavioral_subj_indices);
-    [r,p] = corr(all_b', logbf) %correlate betas with overall accuracy
-    %}
 
     figure; scatter(bic, acc);
 
