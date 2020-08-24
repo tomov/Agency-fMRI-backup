@@ -1,3 +1,5 @@
+
+%{
 EXPT = optCon_expt();
 
 
@@ -21,8 +23,30 @@ lme6 = -0.5 * bic6;
 lme4 = -0.5 * bic4;
 lme5 = -0.5 * bic5;
 
-logBF = lme5 - lme55;
+logBF = lme4 - lme6;
 logGBF = sum(logBF,1);
+
+r = nan(2, size(lme4,2));
+pxp = nan(2, size(lme4,2));
+xp = nan(2, size(lme4,2));
+bor = nan(1, size(lme4,2));
+for i = 1:size(lme4, 2)
+    i
+
+    lme = [lme4(:,i) lme6(:,i)];
+    [alpha_, exp_r_, xp_, pxp_, bor_, g_] = bms(lme);
+
+    r(:,i) = exp_r_;
+    pxp(:,i) = pxp_;
+    xp(:,i) = xp_;
+    bor(i) = bor_;
+end
+
+save('glm_comparison_voxel.mat', '-v7.3');
+
+%}
+
+load('glm_comparison_voxel.mat');
 
 %[h,p,ci,stat] = ttest(bic6, bic55);
 %stat
@@ -31,6 +55,30 @@ mask = ccnl_load_mask(maskfile);
 
 map = zeros(size(mask));
 %map(mask) = stat.tstat;
-map(mask) = logGBF;
+%map(mask) = logGBF;
+
+
+map(mask) = log(r(1,:) ./ r(2,:)); % log posterior
+%map(mask) = pxp(1,:); % log posterior
+
+
+[Pu,V] = ccnl_load_mask('masks/Pu.nii');
+V.fname = '../Momchil/Pu_post.nii'; % !!!!!!!!!!!
+Ca = ccnl_load_mask('masks/Ca.nii');
+Na = ccnl_load_mask('masks/NAC.nii');
+Str = Pu | Ca | Na;
+
+%{
+Pu_y = squeeze(sum(sum(Pu,1),3));
+miny = min(find(Pu_y));
+maxy = max(find(Pu_y));
+midy = round((miny * 0.7 + maxy * 0.3) );
+Pu(:,midy:end,:) = 0;
+
+spm_write_vol(V, Pu);
+%}
+
+map(~Str) = 0;
 
 bspmview_wrapper(map);
+%bspmview_wrapper(Pu);

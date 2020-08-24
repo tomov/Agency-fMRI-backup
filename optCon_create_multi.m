@@ -3646,6 +3646,105 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
 
 
 
+         % Beta series extraction for PPI (part 1/2)
+         % controls for RPE, psi, RPE*psi
+         % parts of GLM 7 + GLM 25
+        %  
+        % 
+        case 57
+            % 
+            %
+           idx = 0;
+           trial = data.trial(which_trials);
+           
+            for t = 1:numel(feedback_onsets)
+               idx = idx + 1;
+               suffix = ['run_', num2str(run), '_trial_', num2str(trial(t))];
+               multi.names{idx} = ['feedback_onset_', suffix];
+               multi.onsets{idx} = [feedback_onsets(t)];
+               multi.durations{idx} = [0];
+            end
+           
+%            for t = 1:numel(reaction_onsets)
+%                idx = idx + 1;
+%                suffix = ['run_', num2str(run), '_trial_', num2str(trial(t))];
+%                multi.names{idx} = ['reaction_onset_', suffix];
+%                multi.onsets{idx} = [reaction_onsets(t)];
+%                multi.durations{idx} = [0];
+%            end
+           
+          for t = 1:numel(trial_onsets)
+               idx = idx + 1;
+               suffix = ['run_', num2str(run), '_trial_', num2str(trial(t))];
+               multi.names{idx} = ['trial_onset_', suffix];
+               multi.onsets{idx} = [trial_onsets(t)];
+               multi.durations{idx} = [0];
+          end
+
+            
+          %{
+          idx = idx + 1;
+            multi.names{idx} = condition;
+            multi.onsets{idx} = feedback_onsets(~timeouts_latent_guess);
+            multi.durations{idx} = zeros(size(multi.onsets{idx})); %impulse regressor (as opposed to boxcar regressor)
+
+           multi.orth{idx} = 0; % do not orthogonalise them  
+           
+           [RPE,psi] = get_latents(subj_original_idx, run);
+           
+           multi.pmod(idx).name{1} = 'RPEpsi';
+           multi.pmod(idx).param{1} = RPE' .* psi';
+           multi.pmod(idx).poly{1} = 1; 
+           
+           multi.pmod(idx).name{2} = 'RPE';
+           multi.pmod(idx).param{2} = RPE';
+           multi.pmod(idx).poly{2} = 1;   
+           
+           multi.pmod(idx).name{3} = 'psi';
+           multi.pmod(idx).param{3} = psi';
+           multi.pmod(idx).poly{3} = 1;  
+           %}
+           
+
+            % nuisance @ reaction onset
+            %
+            idx = idx + 1;
+            multi.names{idx} = 'reaction_onset';
+            multi.onsets{idx} = reaction_onsets;
+            multi.durations{idx} = zeros(size(multi.onsets{idx}));
+
+            %{
+            % nuisance @ feedback onset
+            %
+            idx = idx + 1;
+            multi.names{idx} = 'trial_onset';
+            multi.onsets{idx} = trial_onsets;
+            multi.durations{idx} = zeros(size(multi.onsets{idx}));
+            %}
+            
+            % nuisance @ latent onset
+            %
+            idx = idx + 1;
+            multi.names{idx} = 'latent_onset';
+            multi.onsets{idx} = latent_onsets;
+            multi.durations{idx} = zeros(size(multi.onsets{idx}));
+            
+            % nuisance @ latent offset
+            %
+            idx = idx + 1;
+            multi.names{idx} = 'latent_offset';
+            multi.onsets{idx} = latent_offsets;
+            multi.durations{idx} = zeros(size(multi.onsets{idx}));
+            
+            %{
+            idx = idx + 1;
+            if sum(timeouts_latent_guess) > 0
+               multi.names{idx} = 'feedback_onset_timeouts';
+               multi.onsets{idx} = feedback_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{idx} = zeros(size(multi.onsets{idx}));
+            end     
+            %}
+
 
                     
             
@@ -3671,7 +3770,7 @@ function [RPE,psi] = get_latents(subj_original_idx, run)
                end
            end
            assert(~isempty(RPE));
-           save debug.mat;
+           %save debug.mat;
            %assert(length(RPE) == length(multi.onsets{1}));
            %assert(length(psi) == length(multi.onsets{1}));
 end
@@ -3686,7 +3785,7 @@ function [RPE] = get_rpe(subj_original_idx, run)
                end
            end
            assert(~isempty(RPE));
-           save debug.mat;
+           %save debug.mat;
            %assert(length(RPE) == length(multi.onsets{1}));
            %assert(length(psi) == length(multi.onsets{1}));
 end

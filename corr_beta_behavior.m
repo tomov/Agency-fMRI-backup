@@ -74,7 +74,6 @@ for i = 1:length(masks)
     latents = results(2).latents(behavioral_subj_indices);
     
     acc = [];
-    lik = [];
     accrun = [];
     for j = 1:length(data2)
         acc(j) = mean(data2(j).acc);
