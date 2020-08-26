@@ -84,7 +84,10 @@ for i = 1:length(masks)
     [r,p] = corr(all_b', acc') %correlate betas with overall accuracy
 
 
-    figure; scatter(bic, acc);
+    figure; scatter(all_b, acc);
+    xlabel('neural beta');
+    ylabel('accuracy');
+    lsline;
 
 
         

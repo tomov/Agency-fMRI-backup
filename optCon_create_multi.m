@@ -91,6 +91,7 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
     benevolent = strcmp(data.condition(which_trials), 'benevolent')';
     wins_adversarial = strcmp(data.feedback(which_trials),'1')' & strcmp(data.condition(which_trials), 'adversarial')';
     timeouts = strcmp(data.feedback(which_trials), 'NA')'; %missing trials
+    choice = data.subj_choice(which_trials);
     
     % timeouts_latent_guess is used because when there is a timeout from
     % feedback, you automatically miss a latent guess, BUT if you dont time
@@ -255,8 +256,7 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
         case 4 
             % 
             %
-            
-    
+
             multi.names{1} = condition;
             multi.onsets{1} = feedback_onsets(~timeouts_latent_guess);
             multi.durations{1} = zeros(size(multi.onsets{1})); %impulse regressor (as opposed to boxcar regressor)
@@ -3646,8 +3646,8 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
 
 
 
-         % Beta series extraction for PPI (part 1/2)
-         % controls for RPE, psi, RPE*psi
+         % feedback onset beta series extraction for PPI (part 1/2)
+         % + nuisance regressors
          % parts of GLM 7 + GLM 25
         %  
         % 
@@ -3664,6 +3664,371 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
                multi.onsets{idx} = [feedback_onsets(t)];
                multi.durations{idx} = [0];
             end
+           
+%            for t = 1:numel(reaction_onsets)
+%                idx = idx + 1;
+%                suffix = ['run_', num2str(run), '_trial_', num2str(trial(t))];
+%                multi.names{idx} = ['reaction_onset_', suffix];
+%                multi.onsets{idx} = [reaction_onsets(t)];
+%                multi.durations{idx} = [0];
+%            end
+           
+            % nuisance @ trial onset
+            %
+            idx = idx + 1;
+            multi.names{idx} = 'trial_onset';
+            multi.onsets{idx} = trial_onsets(~timeouts_latent_guess);
+            multi.durations{idx} = zeros(size(multi.onsets{idx}));
+
+            
+          %{
+          idx = idx + 1;
+            multi.names{idx} = condition;
+            multi.onsets{idx} = feedback_onsets(~timeouts_latent_guess);
+            multi.durations{idx} = zeros(size(multi.onsets{idx})); %impulse regressor (as opposed to boxcar regressor)
+
+           multi.orth{idx} = 0; % do not orthogonalise them  
+           
+           [RPE,psi] = get_latents(subj_original_idx, run);
+           
+           multi.pmod(idx).name{1} = 'RPEpsi';
+           multi.pmod(idx).param{1} = RPE' .* psi';
+           multi.pmod(idx).poly{1} = 1; 
+           
+           multi.pmod(idx).name{2} = 'RPE';
+           multi.pmod(idx).param{2} = RPE';
+           multi.pmod(idx).poly{2} = 1;   
+           
+           multi.pmod(idx).name{3} = 'psi';
+           multi.pmod(idx).param{3} = psi';
+           multi.pmod(idx).poly{3} = 1;  
+           %}
+           
+
+            % nuisance @ reaction onset
+            %
+            idx = idx + 1;
+            multi.names{idx} = 'reaction_onset';
+            multi.onsets{idx} = reaction_onsets;
+            multi.durations{idx} = zeros(size(multi.onsets{idx}));
+
+            %{
+            % nuisance @ feedback onset
+            %
+            idx = idx + 1;
+            multi.names{idx} = 'trial_onset';
+            multi.onsets{idx} = trial_onsets;
+            multi.durations{idx} = zeros(size(multi.onsets{idx}));
+            %}
+            
+            % nuisance @ latent onset
+            %
+            idx = idx + 1;
+            multi.names{idx} = 'latent_onset';
+            multi.onsets{idx} = latent_onsets;
+            multi.durations{idx} = zeros(size(multi.onsets{idx}));
+            
+            % nuisance @ latent offset
+            %
+            idx = idx + 1;
+            multi.names{idx} = 'latent_offset';
+            multi.onsets{idx} = latent_offsets;
+            multi.durations{idx} = zeros(size(multi.onsets{idx}));
+            
+            %{
+            idx = idx + 1;
+            if sum(timeouts_latent_guess) > 0
+               multi.names{idx} = 'feedback_onset_timeouts';
+               multi.onsets{idx} = feedback_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{idx} = zeros(size(multi.onsets{idx}));
+            end     
+            %}
+
+
+        % updated chosen value at feedback onset (no stickiness parameter)
+        % nuisance @ trial and choice onset 
+        % copy of GLM 4
+        % 
+        case 58
+            % 
+            %
+            
+    
+            multi.names{1} = condition;
+            multi.onsets{1} = feedback_onsets(~timeouts_latent_guess);
+            multi.durations{1} = zeros(size(multi.onsets{1})); %impulse regressor (as opposed to boxcar regressor)
+
+           multi.orth{1} = 0; % do not orthogonalise them  
+           
+           %[RPE,psi] = get_latents(subj_original_idx, run);
+           latents = get_rational4_latents(subj_original_idx, run);
+
+           c = latents.c;
+           v = latents.v;
+           i = sub2ind(size(v), 1:size(c,1), c');
+           v_chosen = v(i);
+           
+           multi.pmod(1).name{1} = 'v_chosen';
+           multi.pmod(1).param{1} = v_chosen';
+           multi.pmod(1).poly{1} = 1;   
+           
+
+            % nuisance @ reaction onset
+            %
+            multi.names{2} = 'reaction_onset';
+            multi.onsets{2} = reaction_onsets;
+            multi.durations{2} = zeros(size(multi.onsets{2}));
+
+            % nuisance @ trial onset
+            %
+            multi.names{3} = 'trial_onset';
+            multi.onsets{3} = trial_onsets;
+            multi.durations{3} = zeros(size(multi.onsets{3}));
+            
+            % nuisance @ latent onset
+            %
+            multi.names{4} = 'latent_onset';
+            multi.onsets{4} = latent_onsets;
+            multi.durations{4} = zeros(size(multi.onsets{4}));
+            
+            % nuisance @ latent offset
+            %
+            multi.names{5} = 'latent_offset';
+            multi.onsets{5} = latent_offsets;
+            multi.durations{5} = zeros(size(multi.onsets{5}));
+
+            
+               
+            if sum(timeouts_latent_guess) > 0
+               multi.names{6} = 'feedback_onset_timeouts';
+               multi.onsets{6} = feedback_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{6} = zeros(size(multi.onsets{6}));
+            end     
+            
+             
+        % updated chosen value at feedback onset, both values at trial onset (no stickiness parameter)
+        % nuisance @ trial and choice onset 
+        % copy of GLM 4
+        % 
+        case 59
+            % 
+            %
+            
+    
+            multi.names{1} = condition;
+            multi.onsets{1} = feedback_onsets(~timeouts_latent_guess);
+            multi.durations{1} = zeros(size(multi.onsets{1})); %impulse regressor (as opposed to boxcar regressor)
+
+           multi.orth{1} = 0; % do not orthogonalise them  
+           
+           %[RPE,psi] = get_latents(subj_original_idx, run);
+           latents = get_rational4_latents(subj_original_idx, run);
+
+           c = latents.c;
+           v = latents.v;
+           v_pre = latents.v_pre;
+           i = sub2ind(size(v), 1:size(c,1), c');
+           v_chosen = v(i);
+           
+           multi.pmod(1).name{1} = 'v_chosen';
+           multi.pmod(1).param{1} = v_chosen';
+           multi.pmod(1).poly{1} = 1;   
+           
+
+            % nuisance @ reaction onset
+            %
+            multi.names{2} = 'reaction_onset';
+            multi.onsets{2} = reaction_onsets;
+            multi.durations{2} = zeros(size(multi.onsets{2}));
+
+            % nuisance @ trial onset
+            %
+            multi.names{3} = 'trial_onset';
+            multi.onsets{3} = trial_onsets(~timeouts_latent_guess);
+            multi.durations{3} = zeros(size(multi.onsets{3}));
+
+           multi.pmod(3).name{1} = 'v1_pre';
+           multi.pmod(3).param{1} = v_pre(:,1)';
+           multi.pmod(3).poly{1} = 1;   
+           
+           multi.pmod(3).name{2} = 'v2_pre';
+           multi.pmod(3).param{2} = v_pre(:,2)';
+           multi.pmod(3).poly{2} = 1;   
+            
+            % nuisance @ latent onset
+            %
+            multi.names{4} = 'latent_onset';
+            multi.onsets{4} = latent_onsets;
+            multi.durations{4} = zeros(size(multi.onsets{4}));
+            
+            % nuisance @ latent offset
+            %
+            multi.names{5} = 'latent_offset';
+            multi.onsets{5} = latent_offsets;
+            multi.durations{5} = zeros(size(multi.onsets{5}));
+
+            
+               
+            if sum(timeouts_latent_guess) > 0
+               multi.names{6} = 'feedback_onset_timeouts';
+               multi.onsets{6} = feedback_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{6} = zeros(size(multi.onsets{6}));
+
+               multi.names{7} = 'trial_onset_timeouts';
+               multi.onsets{7} = trial_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{7} = zeros(size(multi.onsets{7}));
+            end     
+            
+            
+                    
+        % both values at trial onset (no stickiness parameter)
+        % nuisance @ trial and choice onset 
+        % copy of GLM 59
+        % 
+        case 60
+            % 
+            %
+            
+    
+            multi.names{1} = condition;
+            multi.onsets{1} = feedback_onsets(~timeouts_latent_guess);
+            multi.durations{1} = zeros(size(multi.onsets{1})); %impulse regressor (as opposed to boxcar regressor)
+
+           multi.orth{1} = 0; % do not orthogonalise them  
+           
+           %[RPE,psi] = get_latents(subj_original_idx, run);
+           latents = get_rational4_latents(subj_original_idx, run);
+
+           v_pre = latents.v_pre;
+
+            % nuisance @ reaction onset
+            %
+            multi.names{2} = 'reaction_onset';
+            multi.onsets{2} = reaction_onsets;
+            multi.durations{2} = zeros(size(multi.onsets{2}));
+
+            % nuisance @ trial onset
+            %
+            multi.names{3} = 'trial_onset';
+            multi.onsets{3} = trial_onsets(~timeouts_latent_guess);
+            multi.durations{3} = zeros(size(multi.onsets{3}));
+
+           multi.pmod(3).name{1} = 'v1_pre';
+           multi.pmod(3).param{1} = v_pre(:,1)';
+           multi.pmod(3).poly{1} = 1;   
+           
+           multi.pmod(3).name{2} = 'v2_pre';
+           multi.pmod(3).param{2} = v_pre(:,2)';
+           multi.pmod(3).poly{2} = 1;   
+            
+            % nuisance @ latent onset
+            %
+            multi.names{4} = 'latent_onset';
+            multi.onsets{4} = latent_onsets;
+            multi.durations{4} = zeros(size(multi.onsets{4}));
+            
+            % nuisance @ latent offset
+            %
+            multi.names{5} = 'latent_offset';
+            multi.onsets{5} = latent_offsets;
+            multi.durations{5} = zeros(size(multi.onsets{5}));
+
+            
+               
+            if sum(timeouts_latent_guess) > 0
+               multi.names{6} = 'feedback_onset_timeouts';
+               multi.onsets{6} = feedback_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{6} = zeros(size(multi.onsets{6}));
+
+               multi.names{7} = 'trial_onset_timeouts';
+               multi.onsets{7} = trial_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{7} = zeros(size(multi.onsets{7}));
+            end     
+            
+            
+        % both sticky values at trial onset (with stickiness parameter)
+        % nuisance @ trial and choice onset 
+        % copy of GLM 60
+        % 
+        case 61
+            % 
+            %
+            
+    
+            multi.names{1} = condition;
+            multi.onsets{1} = feedback_onsets(~timeouts_latent_guess);
+            multi.durations{1} = zeros(size(multi.onsets{1})); %impulse regressor (as opposed to boxcar regressor)
+
+           multi.orth{1} = 0; % do not orthogonalise them  
+           
+           %[RPE,psi] = get_latents(subj_original_idx, run);
+           latents = get_rational4_latents(subj_original_idx, run);
+
+           q = latents.q;
+
+            % nuisance @ reaction onset
+            %
+            multi.names{2} = 'reaction_onset';
+            multi.onsets{2} = reaction_onsets;
+            multi.durations{2} = zeros(size(multi.onsets{2}));
+
+            % nuisance @ trial onset
+            %
+            multi.names{3} = 'trial_onset';
+            multi.onsets{3} = trial_onsets(~timeouts_latent_guess);
+            multi.durations{3} = zeros(size(multi.onsets{3}));
+
+           multi.pmod(3).name{1} = 'q1';
+           multi.pmod(3).param{1} = q(:,1)';
+           multi.pmod(3).poly{1} = 1;   
+           
+           multi.pmod(3).name{2} = 'q2';
+           multi.pmod(3).param{2} = q(:,2)';
+           multi.pmod(3).poly{2} = 1;   
+            
+            % nuisance @ latent onset
+            %
+            multi.names{4} = 'latent_onset';
+            multi.onsets{4} = latent_onsets;
+            multi.durations{4} = zeros(size(multi.onsets{4}));
+            
+            % nuisance @ latent offset
+            %
+            multi.names{5} = 'latent_offset';
+            multi.onsets{5} = latent_offsets;
+            multi.durations{5} = zeros(size(multi.onsets{5}));
+
+            
+               
+            if sum(timeouts_latent_guess) > 0
+               multi.names{6} = 'feedback_onset_timeouts';
+               multi.onsets{6} = feedback_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{6} = zeros(size(multi.onsets{6}));
+
+               multi.names{7} = 'trial_onset_timeouts';
+               multi.onsets{7} = trial_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{7} = zeros(size(multi.onsets{7}));
+            end     
+            
+            
+       
+
+         % trial onset beta series extraction for PPI (part 1/2)
+         % + nuisance regressors
+         % parts of GLM 7 + GLM 25
+        %  
+        % 
+        case 62
+            % 
+            %
+           idx = 0;
+           trial = data.trial(which_trials);
+          
+           idx = idx + 1;
+            multi.names{idx} = condition;
+            multi.onsets{idx} = feedback_onsets(~timeouts_latent_guess);
+            multi.durations{idx} = zeros(size(multi.onsets{idx})); %impulse regressor (as opposed to boxcar regressor)
+
            
 %            for t = 1:numel(reaction_onsets)
 %                idx = idx + 1;
@@ -3746,8 +4111,186 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
             %}
 
 
-                    
+
+        % |v| at trial onset (no stickiness parameter)
+        % nuisance @ trial and choice onset 
+        % copy of GLM 59
+        % 
+        case 63
+            % 
+            %
             
+    
+            multi.names{1} = condition;
+            multi.onsets{1} = feedback_onsets(~timeouts_latent_guess);
+            multi.durations{1} = zeros(size(multi.onsets{1})); %impulse regressor (as opposed to boxcar regressor)
+
+           multi.orth{1} = 0; % do not orthogonalise them  
+           
+           %[RPE,psi] = get_latents(subj_original_idx, run);
+           latents = get_rational4_latents(subj_original_idx, run);
+
+           v_pre = latents.v_pre;
+
+            % nuisance @ reaction onset
+            %
+            multi.names{2} = 'reaction_onset';
+            multi.onsets{2} = reaction_onsets;
+            multi.durations{2} = zeros(size(multi.onsets{2}));
+
+            % nuisance @ trial onset
+            %
+            multi.names{3} = 'trial_onset';
+            multi.onsets{3} = trial_onsets(~timeouts_latent_guess);
+            multi.durations{3} = zeros(size(multi.onsets{3}));
+
+           multi.pmod(3).name{1} = 'v';
+           multi.pmod(3).param{1} = abs(v_pre(:,1) - v_pre(:,2))';
+           multi.pmod(3).poly{1} = 1;   
+            
+            % nuisance @ latent onset
+            %
+            multi.names{4} = 'latent_onset';
+            multi.onsets{4} = latent_onsets;
+            multi.durations{4} = zeros(size(multi.onsets{4}));
+            
+            % nuisance @ latent offset
+            %
+            multi.names{5} = 'latent_offset';
+            multi.onsets{5} = latent_offsets;
+            multi.durations{5} = zeros(size(multi.onsets{5}));
+
+            
+               
+            if sum(timeouts_latent_guess) > 0
+               multi.names{6} = 'feedback_onset_timeouts';
+               multi.onsets{6} = feedback_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{6} = zeros(size(multi.onsets{6}));
+
+               multi.names{7} = 'trial_onset_timeouts';
+               multi.onsets{7} = trial_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{7} = zeros(size(multi.onsets{7}));
+            end     
+            
+
+
+        % |q| sticky values at trial onset (with stickiness parameter)
+        % nuisance @ trial and choice onset 
+        % copy of GLM 60
+        % 
+        case 64
+            % 
+            %
+            
+    
+            multi.names{1} = condition;
+            multi.onsets{1} = feedback_onsets(~timeouts_latent_guess);
+            multi.durations{1} = zeros(size(multi.onsets{1})); %impulse regressor (as opposed to boxcar regressor)
+
+           multi.orth{1} = 0; % do not orthogonalise them  
+           
+           %[RPE,psi] = get_latents(subj_original_idx, run);
+           latents = get_rational4_latents(subj_original_idx, run);
+
+           q = latents.q;
+
+            % nuisance @ reaction onset
+            %
+            multi.names{2} = 'reaction_onset';
+            multi.onsets{2} = reaction_onsets;
+            multi.durations{2} = zeros(size(multi.onsets{2}));
+
+            % nuisance @ trial onset
+            %
+            multi.names{3} = 'trial_onset';
+            multi.onsets{3} = trial_onsets(~timeouts_latent_guess);
+            multi.durations{3} = zeros(size(multi.onsets{3}));
+
+           multi.pmod(3).name{1} = 'q1';
+           multi.pmod(3).param{1} = abs(q(:,1) - q(:,2))';
+           multi.pmod(3).poly{1} = 1;   
+            
+            % nuisance @ latent onset
+            %
+            multi.names{4} = 'latent_onset';
+            multi.onsets{4} = latent_onsets;
+            multi.durations{4} = zeros(size(multi.onsets{4}));
+            
+            % nuisance @ latent offset
+            %
+            multi.names{5} = 'latent_offset';
+            multi.onsets{5} = latent_offsets;
+            multi.durations{5} = zeros(size(multi.onsets{5}));
+
+            
+               
+            if sum(timeouts_latent_guess) > 0
+               multi.names{6} = 'feedback_onset_timeouts';
+               multi.onsets{6} = feedback_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{6} = zeros(size(multi.onsets{6}));
+
+               multi.names{7} = 'trial_onset_timeouts';
+               multi.onsets{7} = trial_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{7} = zeros(size(multi.onsets{7}));
+            end     
+            
+
+        % psi sanity -- same as 11 but
+        % 
+        case 65
+            % 
+            %
+            
+    
+            multi.names{1} = condition;
+            multi.onsets{1} = feedback_onsets(~timeouts_latent_guess);
+            multi.durations{1} = zeros(size(multi.onsets{1})); %impulse regressor (as opposed to boxcar regressor)
+
+           multi.orth{1} = 0; % do not orthogonalise them  
+           
+           %[RPE,psi] = get_latents(subj_original_idx, run);
+           latents = get_rational4_latents(subj_original_idx, run);
+
+           psi = latents.psi;
+           
+           multi.pmod(1).name{1} = 'psi';
+           multi.pmod(1).param{1} = psi';
+           multi.pmod(1).poly{1} = 1;   
+           
+
+            % nuisance @ reaction onset
+            %
+            multi.names{2} = 'reaction_onset';
+            multi.onsets{2} = reaction_onsets;
+            multi.durations{2} = zeros(size(multi.onsets{2}));
+
+            % nuisance @ trial onset
+            %
+            multi.names{3} = 'trial_onset';
+            multi.onsets{3} = trial_onsets;
+            multi.durations{3} = zeros(size(multi.onsets{3}));
+            
+            % nuisance @ latent onset
+            %
+            multi.names{4} = 'latent_onset';
+            multi.onsets{4} = latent_onsets;
+            multi.durations{4} = zeros(size(multi.onsets{4}));
+            
+            % nuisance @ latent offset
+            %
+            multi.names{5} = 'latent_offset';
+            multi.onsets{5} = latent_offsets;
+            multi.durations{5} = zeros(size(multi.onsets{5}));
+
+            
+               
+            if sum(timeouts_latent_guess) > 0
+               multi.names{6} = 'feedback_onset_timeouts';
+               multi.onsets{6} = feedback_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{6} = zeros(size(multi.onsets{6}));
+            end     
+            
+
         otherwise
             assert(false, 'invalid glmodel -- should be one of the above');
 

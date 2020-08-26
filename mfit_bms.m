@@ -1,4 +1,5 @@
 function bms_results = mfit_bms(results,use_bic)
+  
     
     % Bayesian model selection for group studies. Uses the Laplace
     % approximation to the marginal likelihood. If the Hessian is
