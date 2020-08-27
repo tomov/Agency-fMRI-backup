@@ -1,14 +1,22 @@
 % compare functional connectivity
-% run after corr_beta_behavior
 
-%{
-MTG_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_ROI_x=54_y=-26_z=-12_155voxels_Sphere10.nii', goodSubjs, false, false);
-MTG_control_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_contra_x=-54_y=-26_z=-12_0voxels_Sphere10.nii', goodSubjs, false, false);
-Pu4_r = ccnl_get_residuals(EXPT, 25, '../Momchil/Put_Sphere4.nii', goodSubjs, false, false);
-NAC4_r = ccnl_get_residuals(EXPT, 25, '../Momchil/NAcc_Sphere4.nii', goodSubjs, false, false);
+addpath('/users/mtomov13/matlab/');
+startup
 
 
-%}
+EXPT = optCon_expt;
+EXPT.modeldir = fullfile(EXPT.modeldir, 's3_analyses_aug2020');
+goodSubjs = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 23, 26, 28:30, 32:34]; %this is SPM index!
+
+
+whiten = true;
+filter = true;
+MTG_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_ROI_x=54_y=-26_z=-12_33voxels_Sphere4.nii', goodSubjs, whiten, filter);
+MTG_control_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_contra_ROI_x=-54_y=-26_z=-12_33voxels_Sphere4.nii', goodSubjs, whiten, filter);
+Pu4_r = ccnl_get_residuals(EXPT, 25, '../Momchil/Put_Sphere4.nii', goodSubjs, whiten, filter);
+NAC4_r = ccnl_get_residuals(EXPT, 25, '../Momchil/NAcc_Sphere4.nii', goodSubjs, whiten, filter);
+
+
 
 % load functional_connectivity.mat
 
