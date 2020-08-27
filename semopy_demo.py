@@ -1,3 +1,6 @@
+# structural equation modeling to discover functional connectivity
+# data generated with get_betas_for_tetrad.m
+
 # install with:
 # pip install semopy==2.0.0a4
 # follow http://semopy.com/tutorial.html not https://pypi.org/project/semopy/
@@ -7,26 +10,56 @@
 # and sys.path.append('/Users/momchil/anaconda3/lib/python3.7/site-packages/semopy')
 # and also rename parser.py to e.g. parser_sem.py and import it like that...
 from semopy import Model
-
-from IPython import embed
-
-
-mod = """ Put ~ MTG + VS
-          VS ~ MTG 
-          MTG ~ VS
-      """
-model = Model(mod)
-
-import pandas as pd
-data = pd.read_csv('feedback_onset/feedback_onset_SPMsubj1.txt', sep='\t')
-#model.load_data(data)
-
 from semopy import stats
+import numpy as np
+import os
+import pandas as pd
+from IPython import embed
+import scipy.io
 
-opt_res = model.fit(data)
-estimates = model.inspect()
 
-print(stats.calc_bic(model))
+names = ['parallel', 'serial', 'hybrid']
 
-embed()
+descs = [""" Put ~ MTG
+             VS ~ MTG
+         """,
+         """ Put ~ VS
+             VS ~ MTG 
+         """,
+         """ Put ~ MTG + VS
+             VS ~ MTG
+         """]
+
+
+files = os.listdir('feedback_onset')
+
+n = len(files) # num subjects
+m = len(descs) # num models
+
+lme = np.zeros((n, m))
+
+for i in range(n):
+
+    for j in range(m):
+
+        model = Model(descs[j])
+
+        #filepath = os.path.join('feedback_onset', files[i])
+        filepath = os.path.join('trial_onset', files[i])
+        data = pd.read_csv(filepath, sep='\t')
+
+        opt_res = model.fit(data)
+
+        bic = stats.calc_bic(model)
+        lme[i,j] = -0.5 * bic
+
+
+        print('subj', i, ' mod ', j, filepath)
+
+
+d = {'lme': lme,
+     'files': files,
+     'descs': descs}
+
+scipy.io.savemat('semopy_trial_onset_lmes.mat', d)
 
