@@ -30,8 +30,10 @@ descs = [""" Put ~ MTG
              VS ~ MTG
          """]
 
-
-files = os.listdir('feedback_onset')
+#dirname = 'feedback_onset';
+#dirname = 'trial_onset';
+dirname = 'residuals';
+files = os.listdir(dirname)
 
 n = len(files) # num subjects
 m = len(descs) # num models
@@ -44,8 +46,7 @@ for i in range(n):
 
         model = Model(descs[j])
 
-        #filepath = os.path.join('feedback_onset', files[i])
-        filepath = os.path.join('trial_onset', files[i])
+        filepath = os.path.join(dirname, files[i])
         data = pd.read_csv(filepath, sep='\t')
 
         opt_res = model.fit(data)
@@ -61,5 +62,7 @@ d = {'lme': lme,
      'files': files,
      'descs': descs}
 
-scipy.io.savemat('semopy_trial_onset_lmes.mat', d)
+scipy.io.savemat('semopy_%s_lmes.mat' % dirname, d)
+
+
 
