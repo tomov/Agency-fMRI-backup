@@ -19,23 +19,7 @@ import scipy.io
 from scipy.stats import wishart
 
 
-names = ['parallel', 'serial', 'hybrid', 'converging']
-
-'''
-descs = [""" put ~ mtg 
-             vs ~ mtg 
-             put =~ Put
-             mtg =~ MTG
-             vs =~ VS
-         """,
-         """ put ~ vs + mtg
-             vs ~ mtg
-             put =~ Put
-             mtg =~ MTG
-             vs =~ VS
-         """,
-         ]
-'''
+names = ['parallel', 'serial A', 'serial B', 'hybrid']
 
 descs = [""" Put ~ MTG
              VS ~ MTG
@@ -44,9 +28,9 @@ descs = [""" Put ~ MTG
              VS ~ MTG 
          """,
          """ Put ~ MTG + VS
-             VS ~ MTG
          """,
          """ Put ~ MTG + VS
+             VS ~ MTG
          """
          ]
 
