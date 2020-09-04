@@ -12,12 +12,17 @@ function latents = get_rational4_latents(subj_original_idx, run)
        s = find([data.sub] == subj_original_idx);
        assert(length(s) == 1);
 
-       w = data(s).run_num == run;
+       if exist('run', 'var')
+           w = data(s).run_num == run;
+       else
+           w = logical(ones(size(data(s).run_num)));
+       end
 
        fn = fieldnames(results(2).latents);
        latents = struct;
        for k=1:numel(fn)
            latents.(fn{k}) = results(2).latents(s).(fn{k})(w,:);
        end
+       latents.run_num = data(s).run_num;
 end
 

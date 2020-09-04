@@ -604,6 +604,7 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
            
            [RPE,psi] = get_latents(subj_original_idx, run);
 
+           assert(length(psi) == length(multi.onsets{1}));
            multi.pmod(1).name{1} = 'psi';
            multi.pmod(1).param{1} = psi';
            multi.pmod(1).poly{1} = 1; 
@@ -3656,12 +3657,13 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
             %
            idx = 0;
            trial = data.trial(which_trials);
-           
-            for t = 1:numel(feedback_onsets)
+          
+            fb_idx = find(~timeouts_latent_guess);
+            for t = 1:numel(fb_idx)
                idx = idx + 1;
-               suffix = ['run_', num2str(run), '_trial_', num2str(trial(t))];
+               suffix = ['run_', num2str(run), '_trial_', num2str(trial(fb_idx(t)))];
                multi.names{idx} = ['feedback_onset_', suffix];
-               multi.onsets{idx} = [feedback_onsets(t)];
+               multi.onsets{idx} = [feedback_onsets(fb_idx(t))];
                multi.durations{idx} = [0];
             end
            
@@ -3735,14 +3737,17 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
             multi.onsets{idx} = latent_offsets;
             multi.durations{idx} = zeros(size(multi.onsets{idx}));
             
-            %{
-            idx = idx + 1;
             if sum(timeouts_latent_guess) > 0
+                idx = idx + 1;
                multi.names{idx} = 'feedback_onset_timeouts';
                multi.onsets{idx} = feedback_onsets(timeouts_latent_guess); % timeouts only
                multi.durations{idx} = zeros(size(multi.onsets{idx}));
+
+                idx = idx + 1;
+               multi.names{idx} = 'trial_onset_timeouts';
+               multi.onsets{idx} = trial_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{idx} = zeros(size(multi.onsets{idx}));
             end     
-            %}
 
 
         % updated chosen value at feedback onset (no stickiness parameter)
@@ -4037,12 +4042,13 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
 %                multi.onsets{idx} = [reaction_onsets(t)];
 %                multi.durations{idx} = [0];
 %            end
-           
-          for t = 1:numel(trial_onsets)
+          
+          tr_idx = find(~timeouts_latent_guess);
+          for t = 1:numel(tr_idx)
                idx = idx + 1;
-               suffix = ['run_', num2str(run), '_trial_', num2str(trial(t))];
+               suffix = ['run_', num2str(run), '_trial_', num2str(trial(tr_idx(t)))];
                multi.names{idx} = ['trial_onset_', suffix];
-               multi.onsets{idx} = [trial_onsets(t)];
+               multi.onsets{idx} = [trial_onsets(tr_idx(t))];
                multi.durations{idx} = [0];
           end
 
@@ -4101,14 +4107,17 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
             multi.onsets{idx} = latent_offsets;
             multi.durations{idx} = zeros(size(multi.onsets{idx}));
             
-            %{
-            idx = idx + 1;
             if sum(timeouts_latent_guess) > 0
+                idx = idx + 1;
                multi.names{idx} = 'feedback_onset_timeouts';
                multi.onsets{idx} = feedback_onsets(timeouts_latent_guess); % timeouts only
                multi.durations{idx} = zeros(size(multi.onsets{idx}));
+
+                idx = idx + 1;
+               multi.names{idx} = 'trial_onset_timeouts';
+               multi.onsets{idx} = trial_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{idx} = zeros(size(multi.onsets{idx}));
             end     
-            %}
 
 
 
