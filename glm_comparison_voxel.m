@@ -51,7 +51,7 @@ load('glm_comparison_voxel.mat');
 %[h,p,ci,stat] = ttest(bic6, bic55);
 %stat
 
-mask = ccnl_load_mask(maskfile);
+[mask, Vmask] = ccnl_load_mask(maskfile);
 
 map = zeros(size(mask));
 %map(mask) = stat.tstat;
@@ -68,6 +68,15 @@ Ca = ccnl_load_mask('masks/Ca.nii');
 Na = ccnl_load_mask('masks/NAC.nii');
 Str = Pu | Ca | Na;
 
+Str_L = Str;
+Str_R = Str;
+
+L_xs = 1:round(size(Str,1)/2); % one hemisphere
+R_xs = round(size(Str,1)/2)+1:size(Str,1); % one hemisphere
+Str_R(L_xs,:,:) = 0;
+Str_L(R_xs,:,:) = 0;
+
+
 %{
 Pu_y = squeeze(sum(sum(Pu,1),3));
 miny = min(find(Pu_y));
@@ -78,7 +87,53 @@ Pu(:,midy:end,:) = 0;
 spm_write_vol(V, Pu);
 %}
 
+
+map_L = map;
+map_R = map;
+
+map_R(~Str_L) = 0;
+map_L(~Str_R) = 0;
+
 map(~Str) = 0;
 
-bspmview_wrapper(map);
+% find min and max in L and R
+[mi,I] = min(map_L, [], 'all', 'linear');
+[x,y,z] = ind2sub(size(map_L), I);
+cor_min_L = [x y z];
+mni_min_L = cor2mni([x y z], V.mat);
+
+[mi,I] = max(map_L, [], 'all', 'linear');
+[x,y,z] = ind2sub(size(map_L), I);
+cor_max_L = [x y z];
+mni_max_L = cor2mni([x y z], V.mat);
+
+[mi,I] = min(map_R, [], 'all', 'linear');
+[x,y,z] = ind2sub(size(map_R), I);
+cor_min_R = [x y z];
+mni_min_R = cor2mni([x y z], V.mat);
+
+[mi,I] = max(map_R, [], 'all', 'linear');
+[x,y,z] = ind2sub(size(map_R), I);
+cor_max_R = [x y z];
+mni_max_R = cor2mni([x y z], V.mat);
+
+
+r = 3 / 1.5; % 4 mm, bspmview is +1 compared to ours
+min_L_sphere = create_spherical_mask_helper(mask, cor_min_L(1), cor_min_L(2), cor_min_L(3), r, Vmask);
+max_L_sphere = create_spherical_mask_helper(mask, cor_max_L(1), cor_max_L(2), cor_max_L(3), r, Vmask);
+min_R_sphere = create_spherical_mask_helper(mask, cor_min_R(1), cor_min_R(2), cor_min_R(3), r, Vmask);
+max_R_sphere = create_spherical_mask_helper(mask, cor_max_R(1), cor_max_R(2), cor_max_R(3), r, Vmask);
+
+
+
+V.fname = '../Momchil/VS_Sphere4_manual_min.nii';
+spm_write_vol(V, min_L_sphere | min_R_sphere);
+
+V.fname = '../Momchil/Put_Sphere4_manual_max.nii';
+spm_write_vol(V, max_L_sphere | max_R_sphere);
+
+bspmview_wrapper(min_L_sphere | min_R_sphere);
+%bspmview_wrapper(max_L_sphere | max_R_sphere);
+
+%bspmview_wrapper(map);
 %bspmview_wrapper(Pu);

@@ -29,7 +29,10 @@ goodSubjs = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 23, 26, 28:30,
 %masks{1} = '../Momchil/insula_ROI_x=42_y=18_z=8_86voxels_Sphere10.nii'; % R AI from GLM 11 psi (26 subj)
 %masks{1} = '../Momchil/OFC_ROI_x=24_y=28_z=-18_90voxels_Sphere10.nii'; % R OFC from GLM 11 psi (26 subj)
 %masks{1} = '../Momchil/MTG_ROI_x=52_y=-18_z=-10_39voxels_Sphere10.nii'; % R MTL from GLM 11 psi (26 subj)
+
+
 masks{1} = '../Momchil/MTG_ROI_x=54_y=-26_z=-12_155voxels_Sphere10.nii'; % R MTL from GLM 11 psi (23 subj)
+%masks{1} = '../Momchil/MTG_ROI_x=54_y=-26_z=-12_33voxels_Sphere4.nii'; % R MTL from GLM 11 psi (23 subj)
 
 
 

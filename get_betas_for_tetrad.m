@@ -59,6 +59,7 @@ save('get_betas_for_tetrad.mat', '-v7.3');
     
 
 restoredefaultpath; % something in the path (likely SPM) fucks with strfind
+rmpath(genpath('/n/sw/helmod/apps/centos7/Core/spm/'));
 
 for s = 1:length(goodSubjs)
     subj = goodSubjs(s);

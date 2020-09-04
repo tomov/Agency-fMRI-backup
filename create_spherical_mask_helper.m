@@ -1,4 +1,5 @@
-function [sphere_mask, sphere_coords] = create_spherical_mask_helper(mask, x, y, z, r, min_x, max_x, min_y, max_y, min_z, max_z, Vmask)
+function [sphere_mask, sphere_coords] = create_spherical_mask_helper(mask, x, y, z, r, Vmask)
+%function [sphere_mask, sphere_coords] = create_spherical_mask_helper(mask, x, y, z, r, min_x, max_x, min_y, max_y, min_z, max_z, Vmask)
 
     % does the bulk of the work in create_spherical_mask
     % convenient to use if getting multiple masks in bulk (saves some overhead)
@@ -7,6 +8,13 @@ function [sphere_mask, sphere_coords] = create_spherical_mask_helper(mask, x, y,
     sphere_coords = [];
 
     sphere_mask = zeros(size(mask));
+
+    min_x = 1;
+    min_y = 1;
+    min_z = 1;
+    max_x = size(mask, 1);
+    max_y = size(mask, 2);
+    max_z = size(mask, 3);
 
     for newx = floor(x - r) : ceil(x + r)
         if newx < min_x || newx > max_x, continue; end
