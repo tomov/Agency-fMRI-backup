@@ -18,7 +18,7 @@ nRuns = {}; % runs per subject [We don't need this]
 % every trial)
 % S1
 
-%goodSubjects = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 23, 26, 28:30, 32:36]; %this is SPM index!
+%goodSubjects = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 25, 26, 28:30, 32:36]; %this is SPM index!
 % this version is excluding the following subjs (in original indices): 4, 8, 13,15,18,21,24,25,26,29,33,39,40
 % this version was used for imaging analyses with subjs who also met
 % behavioral accuracy criteria - MOST GLMS for final paper will be this
@@ -26,7 +26,7 @@ nRuns = {}; % runs per subject [We don't need this]
 %n=25
 % S2
 
-%goodSubjects = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 23, 26, 28:30, 32:34]; %this is SPM index!
+%goodSubjects = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 25, 26, 28:30, 32:34]; %this is SPM index!
 % this version is excluding the following subjs (in original indices): 4,
 % 8, 13,15,18,21,24,25,26,29,33,39,40, 37, 38
 % this version was used for imaging analyses with subjs who also met
@@ -36,17 +36,17 @@ nRuns = {}; % runs per subject [We don't need this]
 % n = 23
 %S3
 
-%goodSubjects = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 23, 26, 28, 30, 32:35]; %this is SPM index!
+%goodSubjects = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 25, 26, 28, 30, 32:35]; %this is SPM index!
 % this version was used for GLM 17; assertions failed for 2 additional
 % subjs, so this is a new subset of 23 subjs
 %S4
 
-%goodSubjects = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 21, 23, 26, 28:30, 32:36]; %this is SPM index!
+%goodSubjects = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 21, 25, 26, 28:30, 32:36]; %this is SPM index!
 % this version was used for GLM 17; assertions failed for 2 additional
 % subjs, so this is a new subset of 23 subjs
 %S5
 
-goodSubjects = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 19, 20, 21, 23, 24, 26, 28:30, 32:34]; %this is SPM index!
+goodSubjects = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 19, 20, 21, 25, 24, 26, 28:30, 32:34]; %this is SPM index!
 % this version is excluding the following subjs (in original indices):
 % 8, 13,15,18,24,29,33,39,40, 37, 38
 % this version was used for imaging analyses with subjs who did not meet

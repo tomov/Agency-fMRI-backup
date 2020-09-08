@@ -4298,7 +4298,70 @@ function multi = optCon_create_multi(glmodel, subj, run, save_output)
                multi.onsets{6} = feedback_onsets(timeouts_latent_guess); % timeouts only
                multi.durations{6} = zeros(size(multi.onsets{6}));
             end     
+           
+            % copy of 44
+            % wins vs. losses
+            case 66
+                       
+            event_index = 1;
+                      
+            if any(losses & ~timeouts_latent_guess)
+                %loss  trials
+                multi.names{event_index} = 'losses';
+                multi.onsets{event_index} = feedback_onsets(losses  & ~timeouts_latent_guess);
+                multi.durations{event_index} = zeros(size(multi.onsets{event_index})); %impulse regressor (as opposed to boxcar regressor)
+                event_index = event_index +1;
+            end
             
+            if any(wins & ~timeouts_latent_guess)
+                %win  trials
+                multi.names{event_index} = 'wins';
+                multi.onsets{event_index} = feedback_onsets(wins  & ~timeouts_latent_guess);
+                multi.durations{event_index} = zeros(size(multi.onsets{event_index})); %impulse regressor (as opposed to boxcar regressor)
+                event_index = event_index +1;
+            end
+             
+                   multi.orth{1} = 0; % do not orthogonalise them            
+                
+            
+            % nuisance @ reaction onset
+            %
+            multi.names{event_index} = 'reaction_onset';
+            multi.onsets{event_index} = reaction_onsets;
+            multi.durations{event_index} = zeros(size(multi.onsets{event_index}));
+            event_index = event_index +1;
+         
+
+            % nuisance @ trial onset
+            %
+            multi.names{event_index} = 'trial_onset';
+            multi.onsets{event_index} = trial_onsets;
+            multi.durations{event_index} = zeros(size(multi.onsets{event_index}));
+            event_index = event_index +1;
+       
+
+           % nuisance @ latent onset
+            %
+            multi.names{event_index} = 'latent_onset';
+            multi.onsets{event_index} = latent_onsets;
+            multi.durations{event_index} = zeros(size(multi.onsets{event_index}));
+            event_index = event_index +1;
+            
+            % nuisance @ latent offset
+            %
+            multi.names{event_index} = 'latent_offset';
+            multi.onsets{event_index} = latent_offsets;
+            multi.durations{event_index} = zeros(size(multi.onsets{event_index}));
+            event_index = event_index +1;
+        
+            
+            if sum(timeouts_latent_guess) > 0
+               multi.names{event_index} = 'feedback_onset_timeouts';
+               multi.onsets{event_index} = feedback_onsets(timeouts_latent_guess); % timeouts only
+               multi.durations{event_index} = zeros(size(multi.onsets{event_index}));
+               event_index = event_index +1;
+            end       
+                      
 
         otherwise
             assert(false, 'invalid glmodel -- should be one of the above');

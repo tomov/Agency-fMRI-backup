@@ -1,27 +1,24 @@
 
-%{
 EXPT = optCon_expt();
 
 
 %[ subjdirs, nRuns, goodRuns, goodSubjs, subj_original_indices] = optCon_getSubjectsDirsAndRuns()
 
 EXPT = optCon_expt;
-EXPT.modeldir = fullfile(EXPT.modeldir, 's3_analyses_aug2020');
-goodSubjs = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 23, 26, 28:30, 32:34]; %this is SPM index!
+%EXPT.modeldir = fullfile(EXPT.modeldir, 's3_analyses_aug2020');
+%goodSubjs = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 23, 26, 28:30, 32:34]; %this is SPM index!
 
-maskfile = 'masks/NAC.nii';
-maskfile = 'masks/Pu.nii';
-maskfile = 'masks/mask.nii';
+%goodSubjs = [1 2 4 5 6 8 9 10 11 13 15 16 18 20 21 25 26 28 29 30 32 33 34]  % correct S3
+goodSubjs = get_goodSubjs('S1');
 
-bic55 = ccnl_bic_voxel(EXPT, 55, maskfile, goodSubjs);
+%maskfile = 'masks/mask.nii';
+maskfile = '../Momchil/Str_manual.nii';
+
 bic6 = ccnl_bic_voxel(EXPT, 6, maskfile, goodSubjs);
 bic4 = ccnl_bic_voxel(EXPT, 4, maskfile, goodSubjs);
-bic5 = ccnl_bic_voxel(EXPT, 5, maskfile, goodSubjs);
 
-lme55 = -0.5 * bic55;
 lme6 = -0.5 * bic6;
 lme4 = -0.5 * bic4;
-lme5 = -0.5 * bic5;
 
 logBF = lme4 - lme6;
 logGBF = sum(logBF,1);
@@ -44,7 +41,7 @@ end
 
 save('glm_comparison_voxel.mat', '-v7.3');
 
-%}
+
 
 load('glm_comparison_voxel.mat');
 
@@ -58,7 +55,7 @@ map = zeros(size(mask));
 %map(mask) = logGBF;
 
 
-map(mask) = log(r(1,:) ./ r(2,:)); % log posterior
+map(mask) = log(r(2,:) ./ r(1,:)); % log posterior
 %map(mask) = pxp(1,:); % log posterior
 
 
@@ -71,21 +68,22 @@ Str = Pu | Ca | Na;
 Str_L = Str;
 Str_R = Str;
 
+Pu_L = Pu;
+Pu_R = Pu;
+
+Na_L = Na;
+Na_R = Na;
+
 L_xs = 1:round(size(Str,1)/2); % one hemisphere
 R_xs = round(size(Str,1)/2)+1:size(Str,1); % one hemisphere
 Str_R(L_xs,:,:) = 0;
 Str_L(R_xs,:,:) = 0;
+Pu_R(L_xs,:,:) = 0;
+Pu_L(R_xs,:,:) = 0;
+Na_R(L_xs,:,:) = 0;
+Na_L(R_xs,:,:) = 0;
 
 
-%{
-Pu_y = squeeze(sum(sum(Pu,1),3));
-miny = min(find(Pu_y));
-maxy = max(find(Pu_y));
-midy = round((miny * 0.7 + maxy * 0.3) );
-Pu(:,midy:end,:) = 0;
-
-spm_write_vol(V, Pu);
-%}
 
 
 map_L = map;
@@ -125,6 +123,8 @@ min_R_sphere = create_spherical_mask_helper(mask, cor_min_R(1), cor_min_R(2), co
 max_R_sphere = create_spherical_mask_helper(mask, cor_max_R(1), cor_max_R(2), cor_max_R(3), r, Vmask);
 
 
+V.fname = '../Momchil/Str_manual.nii';
+spm_write_vol(V, Str);
 
 V.fname = '../Momchil/VS_Sphere4_manual_min.nii';
 spm_write_vol(V, min_L_sphere | min_R_sphere);
@@ -132,8 +132,8 @@ spm_write_vol(V, min_L_sphere | min_R_sphere);
 V.fname = '../Momchil/Put_Sphere4_manual_max.nii';
 spm_write_vol(V, max_L_sphere | max_R_sphere);
 
-bspmview_wrapper(min_L_sphere | min_R_sphere);
+%bspmview_wrapper(min_L_sphere | min_R_sphere);
 %bspmview_wrapper(max_L_sphere | max_R_sphere);
 
-%bspmview_wrapper(map);
+bspmview_wrapper(map);
 %bspmview_wrapper(Pu);

@@ -1,3 +1,34 @@
+
+%{
+% correlating RPE and RPEpsi
+
+[ subjdirs, nRuns, goodRuns, goodSubjs, subj_original_indices] = optCon_getSubjectsDirsAndRuns();
+goodSubjs = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 23, 26, 28:30, 32:34]; %this is SPM index!
+
+clear rs;
+for s = 1:length(goodSubjs)
+    subj = goodSubjs(s);
+
+    subj_original_indx = subj_original_indices(subj);
+
+    latents = get_rational4_latents(subj_original_indx);
+
+    RPE = latents.rpe;
+    RPEpsi = latents.rpe .* latents.psi;
+
+    [r,p] = corr(RPE, RPEpsi);
+
+    rs(s) = r;
+end
+
+zs = atanh(rs);
+[h,p,ci,stat] = ttest(zs)
+%}
+
+
+%{
+% granger causality
+
 % run after functional_connectivity.m
 
 offset = [-10:1:10];
@@ -30,6 +61,8 @@ end
 
 figure;
 errorbar(offset, r, se);
+
+%}
 
 
 %{

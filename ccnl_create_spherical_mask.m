@@ -48,7 +48,7 @@ max_z = max(all_z);
 
 % create the spherical mask
 %
-[sphere_mask, sphere_coords] = create_spherical_mask_helper(mask, x, y, z, r, min_x, max_x, min_y, max_y, min_z, max_z, Vmask);
+[sphere_mask, sphere_coords] = ccnl_create_spherical_mask_helper(mask, x, y, z, r, min_x, max_x, min_y, max_y, min_z, max_z, Vmask);
 
 % optionally intersect with given mask
 %

@@ -5,23 +5,24 @@ addpath('/users/mtomov13/matlab/');
 startup
 
 
-%{
 EXPT = optCon_expt;
-EXPT.modeldir = fullfile(EXPT.modeldir, 's3_analyses_aug2020');
-goodSubjs = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 23, 26, 28:30, 32:34]; %this is SPM index!
-%}
+%EXPT.modeldir = fullfile(EXPT.modeldir, 's3_analyses_aug2020');
+%goodSubjs = [1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 15, 16, 18, 20, 21, 23, 26, 28:30, 32:34]; %this is SPM index!
+
+goodSubjs = [1 2 4 5 6 8 9 10 11 13 15 16 18 20 21 25 26 28 29 30 32 33 34]  % correct S3
 
 
-%{
 whiten = true;
 filter = true;
-MTG_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_ROI_x=54_y=-26_z=-12_33voxels_Sphere4.nii', goodSubjs, whiten, filter);
-MTG_control_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_contra_ROI_x=-54_y=-26_z=-12_33voxels_Sphere4.nii', goodSubjs, whiten, filter);
+%MTG_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_ROI_x=54_y=-26_z=-12_33voxels_Sphere4.nii', goodSubjs, whiten, filter);
+%MTG_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_ROI_x=54_y=-26_z=-12_515voxels_Sphere10.nii', goodSubjs, whiten, filter);
+MTG_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_ROI_x=54_y=-26_z=-12_155voxels_Sphere10.nii', goodSubjs, whiten, filter);
+%MTG_control_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_contra_ROI_x=-54_y=-26_z=-12_33voxels_Sphere4.nii', goodSubjs, whiten, filter);
+MTG_control_r = ccnl_get_residuals(EXPT, 25, '../Momchil/MTG_contra_ROI_x=-54_y=-26_z=-12_515voxels_Sphere10.nii', goodSubjs, whiten, filter);
 Pu4_r = ccnl_get_residuals(EXPT, 25, '../Momchil/Put_Sphere4.nii', goodSubjs, whiten, filter);
 NAC4_r = ccnl_get_residuals(EXPT, 25, '../Momchil/NAcc_Sphere4.nii', goodSubjs, whiten, filter);
 
 save functional_connectivity.mat
-%}
 
 
 load functional_connectivity.mat
@@ -87,9 +88,27 @@ fprintf('contralateral MTG <-> Putamen vs. contralateral MTG <-> VS: t(%d) = %.3
 
 [r, p] = corr(conn_mn', acc');
 fprintf('MTG (psi ROI) <--> VS (RPE ROI) connectivity tracks behavior: r(%d) = %.3f, p = %.10f\n', length(acc), r, p);
+r1 = r; p1 = p;
 
 [r, p] = corr(conn_mp', acc');
 fprintf('MTG (psi ROI) <--> Pu (RPE*psi ROI) connectivity tracks behavior: r(%d) = %.3f, p = %.10f\n', length(acc), r, p);
+r2 = r; p2 = p;
+
+figure;
+
+subplot(1,2,1);
+scatter(conn_mn', acc');
+xlabel('STS-VS connectivity');
+ylabel('accuracy');
+text(0.1, 0.8, sprintf('r = %.2f, p = %.2f', r1, p1));
+lsline;
+
+subplot(1,2,2);
+scatter(conn_mp', acc');
+xlabel('STS-Put connectivity');
+ylabel('accuracy');
+text(0.1, 0.8, sprintf('r = %.2f, p = %.2f', r2, p2));
+lsline;
 
 [r, p] = corr(conn_pn', acc');
 fprintf('Putamen (RPE*psi ROI) <--> VS (RPE ROI) connectivity tracks behavior: r(%d) = %.3f, p = %.10f\n', length(acc), r, p);
