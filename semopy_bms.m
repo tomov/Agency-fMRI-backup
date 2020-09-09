@@ -10,6 +10,7 @@ load('semopy_feedback_onset_lmes.mat');
 pxp
 bor
 
+%{
 % fixed effects LR test
 
 uLogL = sum(logliks(:,4)); % bigger (unrestricted) model
@@ -18,7 +19,6 @@ dof = sum(ks(:,4) - ks(:,3)); % degrees of freedom = diff in # params
 [h,p,stat,c] = lratiotest(uLogL, rLogL, dof)
 disp(p)
 
-%{
 % (random effects) LR tests
 
 for s = 1:size(lmes,1)
@@ -39,6 +39,7 @@ pxp
 bor
 
 
+%{
 
 disp('residuals');
 load('semopy_residuals_lmes.mat');
@@ -54,4 +55,4 @@ rLogL = sum(logliks(:,3)); % smaller (restricted/nested) model
 dof = sum(ks(:,4) - ks(:,3)); % degrees of freedom = diff in # params
 [h,p,stat,c] = lratiotest(uLogL, rLogL, dof)
 disp(p)
-
+%}

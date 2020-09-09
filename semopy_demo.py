@@ -21,6 +21,7 @@ from scipy.stats import wishart
 
 names = ['parallel', 'serial A', 'serial B', 'hybrid']
 
+'''
 descs = [""" Put ~ MTG
              VS ~ MTG
          """,
@@ -34,7 +35,6 @@ descs = [""" Put ~ MTG
          """
          ]
 
-'''
 descs = [""" Put ~ MTG + RPEpsi
              VS ~ MTG + RPE
              MTG ~ psi
@@ -87,9 +87,282 @@ descs = [""" put ~ mtg + RPEpsi
          ]
 '''
 
+'''
+descs = [""" Put ~ IFG
+             VS ~ IFG
+         """,
+         """ Put ~ VS
+             VS ~ IFG 
+         """,
+         """ Put ~ IFG + VS
+         """,
+         """ Put ~ IFG + VS
+             VS ~ IFG
+         """
+         ]
+'''
 
-for dirname in ['feedback_onset', 'trial_onset', 'residuals']:
-#for dirname in ['feedback_onset']:
+descs = [""" Put ~ RPEpsi + IFG
+             VS ~ RPE + IFG
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + VS
+             VS ~ RPE + IFG 
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + IFG + VS 
+             VS ~ RPE
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + IFG + VS
+             VS ~ RPE + IFG
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + IFG
+             VS ~ RPE
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + IFG
+             VS ~ RPE
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + IFG
+             VS ~ RPE
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         ]
+
+
+# IFG and Ins
+descs_IFG_Ins = [""" 
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """  
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         """ 
+             IFG ~ psi
+             Ins ~ psi + IFG
+         """,
+         """ 
+             IFG ~ psi + Ins
+             Ins ~ psi + IFG
+         """,
+         ]
+
+
+descs_ifg_ins = [""" 
+             ifg ~ psi
+             ins ~ psi
+             ifg =~ IFG
+             ins =~ Ins
+         """,
+         """  
+             ifg ~ psi + ins
+             ins ~ psi
+             ifg =~ IFG
+             ins =~ Ins
+         """,
+         """ 
+             ifg ~ psi
+             ins ~ psi + ifg
+             ifg =~ IFG
+             ins =~ Ins
+         """,
+         """ 
+             ifg ~ psi + ins
+             ins ~ psi + ifg
+             ifg =~ IFG
+             ins =~ Ins
+         """,
+         ]
+
+# IFG and Ins
+
+'''
+descs = [""" 
+             ifg ~ psi
+             ins ~ psi
+             ifg =~ IFG
+             ins =~ Ins
+         """,
+         """  
+             ifg ~ psi + ins
+             ins ~ psi
+             ifg =~ IFG
+             ins =~ Ins
+         """,
+         """ 
+             ifg ~ psi
+             ins ~ psi + ifg
+             ifg =~ IFG
+             ins =~ Ins
+         """,
+         """ 
+             ifg ~ psi + ins
+             ins ~ psi + ifg
+             ifg =~ IFG
+             ins =~ Ins
+         """,
+         ]
+
+'''
+
+
+# VS and Put
+descs_VS_Put = [""" Put ~ RPEpsi
+             VS ~ RPE
+         """,
+         """ Put ~ RPEpsi + VS
+             VS ~ RPE
+         """,
+         """ Put ~ RPEpsi + VS
+             VS ~ RPE + Put
+         """,
+         ]
+
+descs_vs_put = [""" put ~ RPEpsi
+             vs ~ RPE
+             vs =~ VS
+             put =~ Put
+         """,
+         """ put ~ RPEpsi + vs
+             vs ~ RPE
+             vs =~ VS
+             put =~ Put
+         """,
+         """ put ~ RPEpsi + vs
+             vs ~ RPE + put
+             vs =~ VS
+             put =~ Put
+         """,
+         ]
+
+
+
+'''
+# VS and Put
+descs = [""" put ~ RPEpsi
+             vs ~ RPE
+             put =~ Put
+             vs =~ VS
+         """,
+         """ put ~ RPEpsi + vs
+             vs ~ RPE
+             put =~ Put
+             vs =~ VS
+         """,
+         """ put ~ RPEpsi
+             vs ~ RPE + put
+             put =~ Put
+             vs =~ VS
+         """,
+         """ put ~ RPEpsi + vs
+             vs ~ RPE + put
+             put =~ Put
+             vs =~ VS
+         """,
+         ]
+
+'''
+
+'''
+descs = [""" Put ~ RPEpsi
+             VS ~ RPE
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """ Put ~ VS + IFG
+             VS ~ RPE
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """ Put ~ VS + Ins
+             VS ~ RPE
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """ Put ~ VS + Ins
+             VS ~ RPE + IFG
+             IFG ~ psi
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi
+             VS ~ RPE
+             IFG ~ Ins
+             Ins ~ psi
+         """,
+         """ Put ~ VS + IFG
+             VS ~ RPE
+             IFG ~ Ins
+             Ins ~ psi
+         """,
+         """ Put ~ VS + Ins
+             VS ~ RPE
+             IFG ~ Ins
+             Ins ~ psi
+         """,
+         """ Put ~ VS + Ins
+             VS ~ RPE + IFG
+             IFG ~ Ins
+             Ins ~ psi
+         """,
+
+         ]
+'''
+
+descs_all = [
+         """ Put ~ RPEpsi + VS
+             VS ~ RPE
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + VS + IFG
+             VS ~ RPE
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + VS + Ins
+             VS ~ RPE
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + VS + IFG
+             VS ~ RPE + Ins
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + VS + Ins
+             VS ~ RPE + IFG
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + VS + Ins + IFG
+             VS ~ RPE + IFG + Ins
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+        ]
+
+
+#descs = descs_VS_Put
+#descs = descs_IFG_Ins
+descs = descs_all
+
+
+
+for dirname in ['feedback_onset', 'trial_onset']:
+#for dirname in ['feedback_onset', 'trial_onset', 'residuals']:
+#for dirname in ['residuals']:
 
     print(dirname)
 
@@ -148,6 +421,7 @@ for dirname in ['feedback_onset', 'trial_onset', 'residuals']:
             lmes[i,j] = lme
 
             print('subj=', i, ' mod=', j, filepath, ' k=', k, ' n=', n, ' loglik=', logliks[i,j])
+            print(model.mx_cov.shape)
 
 
     d = {'lmes': lmes,
