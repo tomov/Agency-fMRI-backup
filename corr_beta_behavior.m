@@ -163,4 +163,7 @@ for i = 1:length(masks)
 
 end
 
+save('final_S1_corr_beta_behavior.mat');
+
 table(region, rs, ps)
+

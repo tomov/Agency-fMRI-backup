@@ -34,8 +34,8 @@ VS = ccnl_get_residuals(EXPT, 25, '../Momchil/S1_VS_Sphere4.nii', goodSubjs, whi
 Put = ccnl_get_residuals(EXPT, 25, '../Momchil/S1_Put_Sphere4.nii', goodSubjs, whiten, filter);
 %}
 
-%{
 % S1
+%{
 IFG = ccnl_get_residuals(EXPT, 25, '../Momchil/S1_IFG_ROI_x=42_y=24_z=24_33voxels_Sphere4.nii', goodSubjs, whiten, filter);
 Ins = ccnl_get_residuals(EXPT, 25, '../Momchil/S1_AI_ROI_x=36_y=16_z=6_33voxels_Sphere4.nii', goodSubjs, whiten, filter);
 VS = ccnl_get_residuals(EXPT, 25, '../Momchil/S1_VS_Sphere4.nii', goodSubjs, whiten, filter);
@@ -43,14 +43,14 @@ Put = ccnl_get_residuals(EXPT, 25, '../Momchil/S1_Put_Sphere4.nii', goodSubjs, w
 IFG_contra = ccnl_get_residuals(EXPT, 25, '../Momchil/S1_contra_IFG_ROI_x=-42_y=24_z=24_33voxels_Sphere4.nii', goodSubjs, whiten, filter);
  
 
-save functional_connectivity.mat
+save S1_functional_connectivity.mat
+
 %}
 
+load S1_functional_connectivity.mat
 
-load functional_connectivity.mat
+save final_S1_functional_connectivity.mat
 
-clear conn_ifg_vs;
-clear conn_ifg_put;
 for j = 1:length(goodSubjs)
     ifg = mean(IFG{j}, 2);
     ins = mean(Ins{j}, 2);

@@ -1,3 +1,4 @@
+clear all;
 
 EXPT = optCon_expt();
 
@@ -134,6 +135,8 @@ spm_write_vol(V, max_L_sphere | max_R_sphere);
 
 %bspmview_wrapper(min_L_sphere | min_R_sphere);
 %bspmview_wrapper(max_L_sphere | max_R_sphere);
+
+save('final_S1_glm_comparison_voxel.mat');
 
 bspmview_wrapper(map);
 %bspmview_wrapper(Pu);

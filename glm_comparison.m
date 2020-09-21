@@ -1,4 +1,5 @@
         clear all
+
         [ subjdirs, nRuns, goodRuns, goodSubjs, subj_original_indices] = optCon_getSubjectsDirsAndRuns()
         load_cached_values = false;
         cached_file = fullfile('results', 'glm_comparison.mat');
@@ -229,6 +230,7 @@
                 bics = [bics bic];
             end
 
+
             lme = -0.5 * bics;
 
             [alpha, exp_r, xp, pxp, bor, g] = bms(lme);
@@ -252,4 +254,9 @@
             pxp
             bor
 
+            lmes{i} = lme;
+            pxps{i} = pxp;
+            bors{i} = bor;
         end
+
+        save('final_S1_glm_comparison.mat');

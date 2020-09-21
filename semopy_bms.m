@@ -4,11 +4,14 @@
 % with data from get_betas_for_tetrad.m
 
 disp('feedback_onset');
-load('semopy_feedback_onset_lmes.mat');
+%load('semopy_S1_feedback_onset_lmes.mat');
+load('semopy_Sam_S1_feedback_onset_lmes.mat');
 
 [alpha,exp_r,xp,pxp,bor,g] = bms(lmes);
 pxp
 bor
+
+
 
 %{
 % fixed effects LR test
@@ -33,10 +36,12 @@ end
 
 
 disp('trial_onset');
-load('semopy_trial_onset_lmes.mat');
+%load('semopy_S1_trial_onset_lmes.mat');
+load('semopy_Sam_S1_trial_onset_lmes.mat');
 [alpha,exp_r,xp,pxp,bor,g] = bms(lmes);
 pxp
 bor
+
 
 
 %{

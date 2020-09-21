@@ -323,50 +323,96 @@ descs = [""" Put ~ RPEpsi
 descs_all = [
          """ Put ~ RPEpsi + VS
              VS ~ RPE
-             IFG ~ psi + Ins
-             Ins ~ psi
+             IFG ~ psi 
+             Ins ~ psi + IFG
          """,
          """ Put ~ RPEpsi + VS + IFG
              VS ~ RPE
-             IFG ~ psi + Ins
-             Ins ~ psi
+             IFG ~ psi 
+             Ins ~ psi + IFG
          """,
          """ Put ~ RPEpsi + VS + Ins
              VS ~ RPE
-             IFG ~ psi + Ins
-             Ins ~ psi
+             IFG ~ psi 
+             Ins ~ psi + IFG
          """,
          """ Put ~ RPEpsi + VS + IFG
              VS ~ RPE + Ins
-             IFG ~ psi + Ins
-             Ins ~ psi
+             IFG ~ psi 
+             Ins ~ psi + IFG
          """,
          """ Put ~ RPEpsi + VS + Ins
              VS ~ RPE + IFG
-             IFG ~ psi + Ins
-             Ins ~ psi
+             IFG ~ psi 
+             Ins ~ psi + IFG
          """,
          """ Put ~ RPEpsi + VS + Ins + IFG
              VS ~ RPE + IFG + Ins
-             IFG ~ psi + Ins
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+        ]
+
+
+descs_Sam = [
+         """ Put ~ RPEpsi
+             VS ~ RPE
+             IFG ~ psi 
              Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + Ins
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + IFG
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + Ins + IFG
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + Ins + VS
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + IFG + VS
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + Ins + IFG + VS
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + Ins + VS
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
          """,
         ]
 
 
 #descs = descs_VS_Put
 #descs = descs_IFG_Ins
-descs = descs_all
+#descs = descs_all
+descs = descs_Sam
 
 
 
-for dirname in ['feedback_onset', 'trial_onset']:
+for dirname in ['S1_feedback_onset', 'S1_trial_onset']:
 #for dirname in ['feedback_onset', 'trial_onset', 'residuals']:
 #for dirname in ['residuals']:
 
     print(dirname)
 
     files = os.listdir(dirname)
+    files = [f for f in files if f.endswith('.txt') ]
 
     n_subjects = len(files) # num subjects
     n_models = len(descs) # num models
@@ -423,6 +469,7 @@ for dirname in ['feedback_onset', 'trial_onset']:
             print('subj=', i, ' mod=', j, filepath, ' k=', k, ' n=', n, ' loglik=', logliks[i,j])
             print(model.mx_cov.shape)
 
+    print(lmes.shape)
 
     d = {'lmes': lmes,
          'bics': bics,
@@ -432,7 +479,7 @@ for dirname in ['feedback_onset', 'trial_onset']:
          'files': files,
          'descs': descs}
 
-    scipy.io.savemat('semopy_%s_lmes.mat' % dirname, d)
+    scipy.io.savemat('semopy_Sam_%s_lmes.mat' % dirname, d)
 
 
 
