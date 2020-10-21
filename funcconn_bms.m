@@ -35,6 +35,9 @@ for dirname = {'S1_feedback_onset', 'S1_trial_onset'}
             formula = 'Put ~ RPEpsi + Ins + IFG + VS';
             res{7} = fitglme(tbl,formula);
 
+            formula = 'Put ~ RPEpsi + VS';
+            res{8} = fitglme(tbl,formula);
+
             bic = cellfun(@(x) x.ModelCriterion.BIC, res);
             lmes = [lmes; - 0.5 * bic];
         end

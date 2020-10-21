@@ -354,6 +354,46 @@ descs_all = [
         ]
 
 
+descs_Cx_Str = [
+         """ Put ~ RPEpsi + VS
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + VS + IFG
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + VS + Ins
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + VS + Ins + IFG
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + Ins
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + VS + Ins
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi 
+         """,
+         """ Put ~ RPEpsi + Ins
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi 
+         """,
+        ]
+
+
+
 descs_Sam = [
          """ Put ~ RPEpsi
              VS ~ RPE
@@ -375,6 +415,11 @@ descs_Sam = [
              IFG ~ psi 
              Ins ~ psi
          """,
+         """ Put ~ RPEpsi + VS
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi
+         """,
          """ Put ~ RPEpsi + Ins + VS
              VS ~ RPE
              IFG ~ psi 
@@ -390,7 +435,43 @@ descs_Sam = [
              IFG ~ psi 
              Ins ~ psi
          """,
+
+         """ Put ~ RPEpsi
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + Ins
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + IFG
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + Ins + IFG
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + VS
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
          """ Put ~ RPEpsi + Ins + VS
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + IFG + VS
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + Ins + IFG + VS
              VS ~ RPE
              IFG ~ psi 
              Ins ~ psi + IFG
@@ -398,10 +479,113 @@ descs_Sam = [
         ]
 
 
+descs_confirm_0 = [
+         """ Put ~ RPEpsi + Ins
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + Ins
+             VS ~ RPE
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         ]
+
+
+descs_confirm_1 = [
+         """ Put ~ RPEpsi + Ins
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + Ins + VS
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         """ Put ~ RPEpsi + IFG
+             VS ~ RPE
+             IFG ~ psi 
+             Ins ~ psi + IFG
+         """,
+         ]
+
+descs_confirm_2 = [
+         """ Put ~ RPEpsi + Ins
+             VS ~ RPE
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + Ins + VS
+             VS ~ RPE
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi
+             VS ~ RPE
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         """ Put ~ RPEpsi + IFG
+             VS ~ RPE
+             IFG ~ psi + Ins
+             Ins ~ psi
+         """,
+         ]
+
+
+
+def gen_descs_helper(cur, cand, ix, descs):
+
+    if ix == len(cand):
+        desc = ''
+        for k, v in cur.items():
+            desc += k + ' ~ ' + ' + '.join(v) + '   \n'
+
+        #if 'Ins' in cur['IFG'] and 'IFG' in cur['Ins']:
+        #    return # TODO hack ensure DAG
+        descs.append(desc)
+        return
+
+    # without A -> B
+    gen_descs_helper(cur, cand, ix + 1, descs)
+
+    A = cand[ix][0]
+    B = cand[ix][1]
+    cur[B].append(A)
+    # with A -> B
+    gen_descs_helper(cur, cand, ix + 1, descs)
+    cur[B].remove(A)
+
+def gen_descs(base, cand):
+    descs = []
+    gen_descs_helper(base, cand, 0, descs)
+    return descs
+
+base = {'Put': ['RPEpsi'], 'VS': ['RPE'], 'IFG': ['psi'], 'Ins': ['psi']}
+cand = [('Ins', 'Put'), ('IFG', 'Put'), ('VS', 'Put'), ('IFG', 'Ins'), ('Ins', 'IFG')]
+
+# auto generate models
+#
+#descs = gen_descs(base, cand)
+
+#print(descs)
+#embed()
+
+
 #descs = descs_VS_Put
 #descs = descs_IFG_Ins
 #descs = descs_all
-descs = descs_Sam
+#descs = descs_Sam
+#descs = descs_Cx_Str
+
+descs = descs_confirm_2
 
 
 

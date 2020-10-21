@@ -11,6 +11,10 @@ load('semopy_Sam_S1_feedback_onset_lmes.mat');
 pxp
 bor
 
+[~,i] = max(pxp);
+
+descs(i,:)
+
 
 
 %{
@@ -34,6 +38,7 @@ end
 %}
 
 
+%{
 
 disp('trial_onset');
 %load('semopy_S1_trial_onset_lmes.mat');
@@ -42,6 +47,7 @@ load('semopy_Sam_S1_trial_onset_lmes.mat');
 pxp
 bor
 
+%}
 
 
 %{
