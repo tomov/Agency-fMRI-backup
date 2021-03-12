@@ -1,6 +1,6 @@
 % see semopy_bms.m
 
-figure;
+figure('position', [1001 1111 479 228]);
 
 
 load('fig_5B.mat');
@@ -43,7 +43,7 @@ ylim([-0.01 1.01]);
 xlim([0.5 4.5]);
 ylabel('PXP');
 
-
+print(gcf, '-dpdf', 'semopy_fig.pdf');
 
 % all
 
